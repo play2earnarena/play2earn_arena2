@@ -4,7 +4,40 @@
 <meta charset="UTF-8">
 <title>Play2Earn Runner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyD-YhBz-AkexkNZ8OqIJzEeMN8AhZYqVG0",
+  authDomain: "play2earn-arena-cab9d.firebaseapp.com",
+  projectId: "play2earn-arena-cab9d",
+  storageBucket: "play2earn-arena-cab9d.appspot.com",
+  messagingSenderId: "309303655208",
+  appId: "1:309303655208:web:0e153671ea2591d655ae1d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.saveScoreToFirebase = async function(score) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const userRef = doc(db, "users", user.uid);
+  const snap = await getDoc(userRef);
+
+  if (!snap.exists()) {
+    await setDoc(userRef, { points: score });
+  } else {
+    await updateDoc(userRef, {
+      points: increment(score)
+    });
+  }
+};
+</script>
 <style>
 body {
   margin: 0;
