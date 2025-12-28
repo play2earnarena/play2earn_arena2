@@ -1,0 +1,51 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #0f2027, #000);
+  color: white;
+  text-align: center;
+}
+
+header {
+  background: #111;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+input, button {
+  width: 80%;
+  padding: 10px;
+  margin: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+button {
+  background: #00ffd5;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#tapCircle {
+  width: 180px;
+  height: 180px;
+  background: #00ffd5;
+  border-radius: 50%;
+  margin: 40px auto;
+  box-shadow: 0 0 40px #00ffd5;
+}
+
+.hidden {
+  display: none;
+}
+
+.ad-box {
+  margin: 30px auto;
+  padding: 20px;
+  background: #111;
+  width: 80%;
+  border-radius: 10px;
+  opacity: 0.6;
+}
