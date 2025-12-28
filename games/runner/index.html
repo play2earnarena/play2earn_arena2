@@ -1,13 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Play2Earn Runner</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    margin: 0;
+    background: #0b1020;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+
+  h2 {
+    margin-top: 15px;
+  }
+
+  #score {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+
+  #game {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    margin: 0 auto;
+    background: linear-gradient(#101a3a, #050812);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #00ffd5;
+  }
+
+  #player {
+    position: absolute;
+    bottom: 10px;
+    left: 30px;
+    width: 30px;
+    height: 30px;
+    background: #00ffd5;
+    border-radius: 5px;
+  }
+
+  .obstacle {
+    position: absolute;
+    bottom: 10px;
+    width: 25px;
+    height: 25px;
+    background: #ff4d4d;
+    right: -30px;
+    border-radius: 4px;
+  }
+
+  #jumpBtn {
+    margin-top: 20px;
+    padding: 15px 40px;
+    font-size: 18px;
+    background: #00ffd5;
+    border: none;
+    border-radius: 8px;
+    color: black;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>🏃 Play2Earn Runner</h2>
+<div id="score">Score: 0</div>
+
+<div id="game">
+  <div id="player"></div>
+</div>
+
+<button id="jumpBtn">JUMP</button>
+
+<!-- 🔥 FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-YhBz-AkexkNZ8OqIJzEeMN8AhZYqVG0",
@@ -26,134 +100,108 @@ window.saveScoreToFirebase = async function(score) {
   const user = auth.currentUser;
   if (!user) return;
 
-  const userRef = doc(db, "users", user.uid);
-  const snap = await getDoc(userRef);
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
 
   if (!snap.exists()) {
-    await setDoc(userRef, { points: score });
+    await setDoc(ref, { points: score });
   } else {
-    await updateDoc(userRef, {
-      points: increment(score)
-    });
+    await updateDoc(ref, { points: increment(score) });
   }
 };
 </script>
-<style>
-body {
-  margin: 0;
-  background: #0b1220;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-
-h2 {
-  margin-top: 10px;
-}
-
-#score {
-  margin: 10px;
-  font-size: 18px;
-}
-
-canvas {
-  background: linear-gradient(#1a1f3c, #0b1220);
-  display: block;
-  margin: 10px auto;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,255,255,0.3);
-}
-
-button {
-  background: #00ffd5;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 16px;
-  margin-top: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<h2>🏃 Play2Earn Runner</h2>
-<div id="score">Score: 0</div>
-
-<canvas id="game" width="320" height="180"></canvas>
-
-<button onclick="jump()">JUMP</button>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const player = document.getElementById("player");
+const game = document.getElementById("game");
+const scoreText = document.getElementById("score");
 
-let player = { x: 40, y: 120, w: 20, h: 20, vy: 0 };
-let gravity = 0.9;
-let ground = 140;
-let obstacleX = 320;
+let jumping = false;
+let gravity = 0;
 let score = 0;
-let gameOver = false;
+let gameRunning = true;
 
 function jump() {
-  if (player.y >= ground) {
-    player.vy = -14;
-  }
+  if (jumping) return;
+  jumping = true;
+  gravity = 12;
 }
 
-document.body.addEventListener("touchstart", jump);
+document.getElementById("jumpBtn").addEventListener("click", jump);
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") jump();
+});
 
-function resetGame() {
-  score = 0;
-  obstacleX = 320;
-  gameOver = false;
-  player.y = ground;
-}
-saveScoreToFirebase(score);
-alert("Game Over! Score: " + score);
-score = 0;
-function update() {
-  if (gameOver) return;
+function createObstacle() {
+  if (!gameRunning) return;
 
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const obs = document.createElement("div");
+  obs.className = "obstacle";
+  game.appendChild(obs);
 
-  // Player
-  player.vy += gravity;
-  player.y += player.vy;
-  if (player.y > ground) {
-    player.y = ground;
-    player.vy = 0;
-  }
+  let x = 300;
 
-  ctx.fillStyle = "#00ffd5";
-  ctx.fillRect(player.x, player.y, player.w, player.h);
+  const move = setInterval(() => {
+    if (!gameRunning) {
+      clearInterval(move);
+      obs.remove();
+      return;
+    }
 
-  // Obstacle
-  obstacleX -= 4;
-  if (obstacleX < -20) {
-    obstacleX = 320;
-    score++;
-    document.getElementById("score").innerText = "Score: " + score;
-  }
+    x -= 4;
+    obs.style.right = x + "px";
 
-  ctx.fillStyle = "#ff4d4d";
-  ctx.fillRect(obstacleX, ground + 5, 18, 18);
+    // Collision
+    const pRect = player.getBoundingClientRect();
+    const oRect = obs.getBoundingClientRect();
 
-  // Collision
-  if (
-    player.x < obstacleX + 18 &&
-    player.x + player.w > obstacleX &&
-    player.y + player.h > ground + 5
-  ) {
-    gameOver = true;
-    alert("Game Over! Score: " + score);
-    resetGame();
-  }
+    if (
+      pRect.left < oRect.right &&
+      pRect.right > oRect.left &&
+      pRect.bottom > oRect.top
+    ) {
+      gameOver();
+      clearInterval(move);
+    }
 
-  requestAnimationFrame(update);
+    if (x > 330) {
+      clearInterval(move);
+      obs.remove();
+    }
+  }, 20);
 }
 
-update();
+function gameLoop() {
+  if (!gameRunning) return;
+
+  // Jump physics
+  if (jumping) {
+    let bottom = parseInt(getComputedStyle(player).bottom);
+    bottom += gravity;
+    gravity -= 1;
+
+    if (bottom <= 10) {
+      bottom = 10;
+      jumping = false;
+    }
+    player.style.bottom = bottom + "px";
+  }
+
+  score++;
+  scoreText.innerText = "Score: " + score;
+
+  requestAnimationFrame(gameLoop);
+}
+
+function gameOver() {
+  gameRunning = false;
+  saveScoreToFirebase(score);
+  alert("Game Over! Score: " + score);
+  location.reload();
+}
+
+setInterval(createObstacle, 1800);
+gameLoop();
 </script>
 
 </body>
