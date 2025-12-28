@@ -1,122 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Play2Earn Arena</title>
-
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD-YhBz-AkexkNZ8OqIJzEeMN8AhZYqVG0",
-  authDomain: "play2earn-arena-cab9d.firebaseapp.com",
-  projectId: "play2earn-arena-cab9d",
-  storageBucket: "play2earn-arena-cab9d.appspot.com",
-  messagingSenderId: "309303655208",
-  appId: "1:309303655208:web:0e153671ea2591d655ae1d",
-  measurementId: "G-26L1Z7J069"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-window.register = async () => {
-  const email = emailInput.value;
-  const password = passwordInput.value;
-  const userCred = await createUserWithEmailAndPassword(auth, email, password);
-  await setDoc(doc(db, "users", userCred.user.uid), { points: 0 });
-};
-
-window.login = async () => {
-  await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-};
-
-window.logout = async () => {
-  await signOut(auth);
-};
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    authUI.style.display = "none";
-    userUI.style.display = "block";
-    userEmail.textContent = user.email;
-
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) {
-      points.textContent = snap.data().points;
-    }
-  } else {
-    authUI.style.display = "block";
-    userUI.style.display = "none";
-  }
-});
-</script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0b0f19;
-  color: #fff;
-}
-header {
-  padding: 15px;
-  background: #11162a;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
-  background: #00ffd5;
-  font-weight: bold;
-}
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 6px;
-  border: none;
-}
-section {
-  padding: 20px;
-}
-.games {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 15px;
-}
-.game {
-  background: #141a33;
-  border-radius: 10px;
-  padding: 10px;
-}
-iframe {
-  width: 100%;
-  height: 200px;
-  border-radius: 10px;
-  border: none;
-}
-.ad {
-  background: #1b2140;
-  padding: 20px;
-  text-align: center;
-  margin: 20px 0;
-  border-radius: 10px;
-}
-footer {
-  text-align: center;
-  padding: 15px;
-  opacity: 0.6;
-}
+body{margin:0;background:#0b1220;color:#fff;font-family:sans-serif}
+header{padding:15px;background:#111;display:flex;justify-content:space-between}
+.game{margin:20px;background:#111;border-radius:12px;overflow:hidden}
+iframe{width:100%;height:500px;border:0}
+.ad{margin:20px;padding:20px;background:#1a1f3c;text-align:center;border-radius:12px}
 </style>
 </head>
 
@@ -124,44 +17,25 @@ footer {
 
 <header>
   <h2>🎮 Play2Earn Arena</h2>
-  <div id="userUI" style="display:none;">
-    <span id="userEmail"></span> | Points: <b id="points">0</b>
-    <button onclick="logout()">Logout</button>
-  </div>
+  <button>Login</button>
 </header>
 
-<section id="authUI">
-  <h3>Login / Register</h3>
-  <input id="emailInput" type="email" placeholder="Email">
-  <input id="passwordInput" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <button onclick="register()">Register</button>
-</section>
+<div class="ad">🔥 AD SPACE (Google AdSense Ready)</div>
 
-<section>
-  <div class="ad">
-    🔥 AD SPACE (Google AdSense / Media.net)
-  </div>
+<h2 style="margin-left:20px">Popular Games</h2>
 
-  <h3>Popular Games</h3>
-  <div class="games">
-    <div class="game">
-      <iframe src="https://itch.io/embed-upload/2738568?color=333333"></iframe>
-      <p>Runner Game</p>
-    </div>
-    <div class="game">
-      <iframe src="https://itch.io/embed-upload/2934562?color=333333"></iframe>
-      <p>Arcade Shooter</p>
-    </div>
-    <div class="game">
-      <iframe src="https://itch.io/embed-upload/2812341?color=333333"></iframe>
-      <p>Puzzle Game</p>
-    </div>
-  </div>
-</section>
+<div class="game">
+  <h3 style="padding:10px">Runner Game</h3>
+  <iframe src="games/runner/index.html"></iframe>
+</div>
 
-<footer>
-  © 2025 Play2Earn Arena · Business Gaming Platform
+<div class="game">
+  <h3 style="padding:10px">Clicker Game</h3>
+  <iframe src="games/clicker/index.html"></iframe>
+</div>
+
+<footer style="text-align:center;padding:20px;color:#aaa">
+© 2025 Play2Earn Arena
 </footer>
 
 </body>
