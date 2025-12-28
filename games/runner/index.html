@@ -109,7 +109,9 @@ function resetGame() {
   gameOver = false;
   player.y = ground;
 }
-
+saveScoreToFirebase(score);
+alert("Game Over! Score: " + score);
+score = 0;
 function update() {
   if (gameOver) return;
 
