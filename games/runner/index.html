@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Play2Earn Runner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  background: #0b1220;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+h2 {
+  margin-top: 10px;
+}
+
+#score {
+  margin: 10px;
+  font-size: 18px;
+}
+
+canvas {
+  background: linear-gradient(#1a1f3c, #0b1220);
+  display: block;
+  margin: 10px auto;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,255,255,0.3);
+}
+
+button {
+  background: #00ffd5;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🏃 Play2Earn Runner</h2>
+<div id="score">Score: 0</div>
+
+<canvas id="game" width="320" height="180"></canvas>
+
+<button onclick="jump()">JUMP</button>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let player = { x: 40, y: 120, w: 20, h: 20, vy: 0 };
+let gravity = 0.9;
+let ground = 140;
+let obstacleX = 320;
+let score = 0;
+let gameOver = false;
+
+function jump() {
+  if (player.y >= ground) {
+    player.vy = -14;
+  }
+}
+
+document.body.addEventListener("touchstart", jump);
+
+function resetGame() {
+  score = 0;
+  obstacleX = 320;
+  gameOver = false;
+  player.y = ground;
+}
+
+function update() {
+  if (gameOver) return;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Player
+  player.vy += gravity;
+  player.y += player.vy;
+  if (player.y > ground) {
+    player.y = ground;
+    player.vy = 0;
+  }
+
+  ctx.fillStyle = "#00ffd5";
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+
+  // Obstacle
+  obstacleX -= 4;
+  if (obstacleX < -20) {
+    obstacleX = 320;
+    score++;
+    document.getElementById("score").innerText = "Score: " + score;
+  }
+
+  ctx.fillStyle = "#ff4d4d";
+  ctx.fillRect(obstacleX, ground + 5, 18, 18);
+
+  // Collision
+  if (
+    player.x < obstacleX + 18 &&
+    player.x + player.w > obstacleX &&
+    player.y + player.h > ground + 5
+  ) {
+    gameOver = true;
+    alert("Game Over! Score: " + score);
+    resetGame();
+  }
+
+  requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>
