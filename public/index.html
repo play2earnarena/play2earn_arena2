@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Play2Earn Arena</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <h1>🎮 Play2Earn Arena</h1>
+  <button id="logoutBtn" class="hidden">Logout</button>
+</header>
+
+<!-- AUTH -->
+<section id="authBox">
+  <h2>Login / Register</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button id="loginBtn">Login</button>
+  <button id="registerBtn">Register</button>
+</section>
+
+<!-- GAME -->
+<section id="gameBox" class="hidden">
+  <h2>Points: <span id="points">0</span></h2>
+  <h3>Target: <span id="target">2,000,000</span></h3>
+
+  <div id="tapCircle"></div>
+  <p>Tap to earn points</p>
+
+  <!-- AD PLACEHOLDER -->
+  <div class="ad-box">
+    <p>Ad will appear here</p>
+  </div>
+</section>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
