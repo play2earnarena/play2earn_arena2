@@ -2,206 +2,282 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Play2Earn Runner</title>
 
 <style>
-  body {
-    margin: 0;
-    background: #0b1020;
-    color: white;
-    font-family: Arial, sans-serif;
-    text-align: center;
-  }
+/* =======================
+   GLOBAL STYLES
+======================= */
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
 
-  h2 {
-    margin-top: 15px;
-  }
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0f1b3d, #050814);
+  color: #ffffff;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+}
 
-  #score {
-    margin-bottom: 10px;
-    font-size: 18px;
-  }
+/* =======================
+   APP CONTAINER
+======================= */
+.app {
+  width: 100%;
+  max-width: 420px;
+  padding: 16px;
+}
 
-  #game {
-    position: relative;
-    width: 300px;
-    height: 200px;
-    margin: 0 auto;
-    background: linear-gradient(#101a3a, #050812);
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid #00ffd5;
-  }
+/* =======================
+   HEADER
+======================= */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
 
-  #player {
-    position: absolute;
-    bottom: 10px;
-    left: 30px;
-    width: 30px;
-    height: 30px;
-    background: #00ffd5;
-    border-radius: 5px;
-  }
+.title {
+  font-size: 22px;
+  font-weight: 700;
+}
 
-  .obstacle {
-    position: absolute;
-    bottom: 10px;
-    width: 25px;
-    height: 25px;
-    background: #ff4d4d;
-    right: -30px;
-    border-radius: 4px;
-  }
+.points {
+  font-size: 14px;
+  opacity: 0.85;
+}
 
-  #jumpBtn {
-    margin-top: 20px;
-    padding: 15px 40px;
-    font-size: 18px;
-    background: #00ffd5;
-    border: none;
-    border-radius: 8px;
-    color: black;
-  }
+/* =======================
+   GAME CARD
+======================= */
+.game-card {
+  background: linear-gradient(180deg, #0f1f4a, #080c1d);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+/* =======================
+   SCORE
+======================= */
+.score {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* =======================
+   GAME AREA
+======================= */
+.game-area {
+  position: relative;
+  height: 220px;
+  background: linear-gradient(180deg, #0a1330, #050814);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #00ffd5;
+}
+
+/* =======================
+   PLAYER
+======================= */
+.player {
+  position: absolute;
+  bottom: 14px;
+  left: 40px;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #00ffd5, #00bfa6);
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0,255,213,0.8);
+}
+
+/* =======================
+   OBSTACLE
+======================= */
+.obstacle {
+  position: absolute;
+  bottom: 14px;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #ff4d4d, #c62828);
+  border-radius: 5px;
+}
+
+/* =======================
+   CONTROLS
+======================= */
+.controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.jump-btn {
+  width: 160px;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00ffd5, #00bfa6);
+  color: #001d18;
+  box-shadow: 0 10px 30px rgba(0,255,213,0.4);
+}
 </style>
 </head>
 
 <body>
 
-<h2>🏃 Play2Earn Runner</h2>
-<div id="score">Score: 0</div>
+<div class="app">
 
-<div id="game">
-  <div id="player"></div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="title">🏃 Play2Earn Runner</div>
+    <div class="points">Session</div>
+  </div>
+
+  <!-- GAME -->
+  <div class="game-card">
+    <div class="score" id="score">Score: 0</div>
+
+    <div class="game-area" id="game">
+      <div class="player" id="player"></div>
+    </div>
+
+    <div class="controls">
+      <button class="jump-btn" id="jumpBtn">JUMP</button>
+    </div>
+  </div>
+
 </div>
 
-<button id="jumpBtn">JUMP</button>
-
-<!-- 🔥 FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD-YhBz-AkexkNZ8OqIJzEeMN8AhZYqVG0",
-  authDomain: "play2earn-arena-cab9d.firebaseapp.com",
-  projectId: "play2earn-arena-cab9d",
-  storageBucket: "play2earn-arena-cab9d.appspot.com",
-  messagingSenderId: "309303655208",
-  appId: "1:309303655208:web:0e153671ea2591d655ae1d"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-window.saveScoreToFirebase = async function(score) {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) {
-    await setDoc(ref, { points: score });
-  } else {
-    await updateDoc(ref, { points: increment(score) });
-  }
-};
-</script>
-
 <script>
-const player = document.getElementById("player");
+/* =======================
+   GAME STATE
+======================= */
 const game = document.getElementById("game");
-const scoreText = document.getElementById("score");
+const player = document.getElementById("player");
+const scoreEl = document.getElementById("score");
+const jumpBtn = document.getElementById("jumpBtn");
 
-let jumping = false;
-let gravity = 0;
 let score = 0;
-let gameRunning = true;
+let velocity = 0;
+let jumping = false;
+let running = true;
 
+/* =======================
+   PHYSICS CONSTANTS
+======================= */
+const GRAVITY = -0.6;
+const JUMP_FORCE = 11;
+const GROUND = 14;
+
+/* =======================
+   JUMP
+======================= */
 function jump() {
   if (jumping) return;
+  velocity = JUMP_FORCE;
   jumping = true;
-  gravity = 12;
 }
 
-document.getElementById("jumpBtn").addEventListener("click", jump);
+jumpBtn.addEventListener("click", jump);
 document.addEventListener("keydown", e => {
   if (e.code === "Space") jump();
 });
 
-function createObstacle() {
-  if (!gameRunning) return;
+/* =======================
+   CREATE OBSTACLE
+======================= */
+function spawnObstacle() {
+  if (!running) return;
 
   const obs = document.createElement("div");
   obs.className = "obstacle";
   game.appendChild(obs);
 
-  let x = 300;
+  let x = game.offsetWidth;
 
   const move = setInterval(() => {
-    if (!gameRunning) {
+    if (!running) {
       clearInterval(move);
       obs.remove();
       return;
     }
 
     x -= 4;
-    obs.style.right = x + "px";
+    obs.style.left = x + "px";
 
-    // Collision
-    const pRect = player.getBoundingClientRect();
-    const oRect = obs.getBoundingClientRect();
+    const p = player.getBoundingClientRect();
+    const o = obs.getBoundingClientRect();
 
     if (
-      pRect.left < oRect.right &&
-      pRect.right > oRect.left &&
-      pRect.bottom > oRect.top
+      p.left < o.right &&
+      p.right > o.left &&
+      p.bottom > o.top
     ) {
-      gameOver();
+      endGame();
       clearInterval(move);
     }
 
-    if (x > 330) {
+    if (x < -30) {
       clearInterval(move);
       obs.remove();
     }
   }, 20);
 }
 
-function gameLoop() {
-  if (!gameRunning) return;
+/* =======================
+   GAME LOOP
+======================= */
+function loop() {
+  if (!running) return;
 
-  // Jump physics
-  if (jumping) {
-    let bottom = parseInt(getComputedStyle(player).bottom);
-    bottom += gravity;
-    gravity -= 1;
+  // Player physics
+  let bottom = parseFloat(player.style.bottom || GROUND);
+  bottom += velocity;
+  velocity += GRAVITY;
 
-    if (bottom <= 10) {
-      bottom = 10;
-      jumping = false;
-    }
-    player.style.bottom = bottom + "px";
+  if (bottom <= GROUND) {
+    bottom = GROUND;
+    jumping = false;
   }
 
+  player.style.bottom = bottom + "px";
+
   score++;
-  scoreText.innerText = "Score: " + score;
+  scoreEl.textContent = "Score: " + score;
 
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(loop);
 }
 
-function gameOver() {
-  gameRunning = false;
-  saveScoreToFirebase(score);
-  alert("Game Over! Score: " + score);
-  location.reload();
+/* =======================
+   GAME OVER
+======================= */
+function endGame() {
+  running = false;
+
+  // Save score locally (safe & reliable)
+  const total = Number(localStorage.getItem("play2earn_points") || 0);
+  localStorage.setItem("play2earn_points", total + score);
+
+  setTimeout(() => {
+    alert("Game Over\nScore: " + score);
+    location.reload();
+  }, 100);
 }
 
-setInterval(createObstacle, 1800);
-gameLoop();
+/* =======================
+   START GAME
+======================= */
+setInterval(spawnObstacle, 1600);
+loop();
 </script>
 
 </body>
